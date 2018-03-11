@@ -5,6 +5,8 @@
 
 A zone program to display quotes from a specific collection
 
+![Demo](images/demo.gif)
+
 ## Installation
 
 ### Manual
