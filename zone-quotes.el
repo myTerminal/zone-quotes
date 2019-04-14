@@ -48,7 +48,7 @@
 ;;
 ;;     (zone-when-idle 30)
 ;;
-;; Alternatively you can run 'zone-quotes' directly
+;; Alternatively, you can run 'zone-quotes' directly
 ;;
 ;;     (zone-quotes)
 ;;
