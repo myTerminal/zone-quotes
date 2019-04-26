@@ -1,4 +1,4 @@
-;;; zone-quotes.el --- A zone program to display quotes from a specific collection -*- lexical-binding: t; coding: utf-8; -*-
+;;; zone-quotes.el --- A zone program to display quotes from a specific collection -*- lexical-binding: t; -*-
 
 ;; This file is not part of Emacs
 
