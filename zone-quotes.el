@@ -64,6 +64,8 @@
 
 ;;; Code:
 
+(require 'cl-lib)
+
 (defvar zone-quotes-quotes
   (list "Emacs"))
 
@@ -104,13 +106,12 @@
     splitted-string))
 
 (defun zone-quotes--get-formatted-string (splitted-string)
-  (reduce (lambda (a c)
-            (concatenate 'string
-                         a
-                         "\n"
-                         c
-                         ))
-          splitted-string))
+  (cl-reduce (lambda (a c)
+               (concat a
+                       "\n"
+                       c
+                       ))
+             splitted-string))
 
 ;;;###autoload
 (defun zone-pgm-quotes ()
