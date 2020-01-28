@@ -71,10 +71,13 @@
 
 ;;;###autoload
 (defun zone-quotes-set-quotes (quotes)
+  "Sets quotes to be used"
   (setq zone-quotes-quotes
         quotes))
 
 (defun zone-quotes--get-splitted-string (input-string string-width offset-width)
+  "Splits an input string according to the required width and specified position
+on the screen"
   (let* ((splitted-string '()))
     (if (> (length input-string)
            (- string-width
@@ -106,12 +109,26 @@
     splitted-string))
 
 (defun zone-quotes--get-formatted-string (splitted-string)
+  "Gets a string joining input strings"
   (cl-reduce (lambda (a c)
                (concat a
                        "\n"
                        c
                        ))
              splitted-string))
+
+(defun zone-quotes--render-string (string-to-be-rendered offset-x offset-y currentp)
+  "Renders a string at a provided position on the screen buffer"
+  (beginning-of-buffer)
+  (forward-line offset-y)
+  (forward-char offset-x)
+  (delete-char (length string-to-be-rendered))
+  (cond (currentp (insert (propertize string-to-be-rendered
+                                      'face
+                                      '(:inverse-video t))))
+        (t (insert (propertize string-to-be-rendered
+                               'face
+                               '(:strike-through t))))))
 
 ;;;###autoload
 (defun zone-pgm-quotes ()
@@ -136,19 +153,15 @@
                                                                  0)
                                                               x-position))
            (string-to-be-printed (zone-quotes--get-formatted-string splitted-string)))
-      (beginning-of-buffer)
-      (forward-line y-position)
-      (forward-char x-position)
-      (delete-char (length string-to-be-printed))
-      (insert (propertize string-to-be-printed
-                          'face
-                          '(:inverse-video t)))
+      (zone-quotes--render-string string-to-be-printed
+                                  x-position
+                                  y-position
+                                  t)
       (sit-for 7)
-      (backward-char (length string-to-be-printed))
-      (delete-char (length string-to-be-printed))
-      (insert (propertize string-to-be-printed
-                          'face
-                          '(:strike-through t))))))
+      (zone-quotes--render-string string-to-be-printed
+                                  x-position
+                                  y-position
+                                  nil))))
 
 ;;;###autoload
 (defun zone-quotes ()
