@@ -7,7 +7,7 @@
 ;; Keywords: games
 ;; Maintainer: Mohammed Ismail Ansari <team.terminal@gmail.com>
 ;; Created: 2017/09/11
-;; Package-Requires: ((emacs "24"))
+;; Package-Requires: ((emacs "24") (cl-lib "0.5")))
 ;; Description: A zone program to display quotes from a specific collection
 ;; URL: http://ismail.teamfluxion.com
 ;; Compatibility: Emacs24
@@ -71,97 +71,89 @@
 
 ;;;###autoload
 (defun zone-quotes-set-quotes (quotes)
-  "Sets quotes to be used"
+  "Sets quotes to be used."
   (setq zone-quotes-quotes
         quotes))
-
-(defun zone-quotes--get-splitted-string (input-string string-width offset-width)
-  "Splits an input string according to the required width and specified position
-on the screen"
-  (let* ((splitted-string '()))
-    (if (> (length input-string)
-           (- string-width
-              offset-width))
-        (progn
-          (add-to-list 'splitted-string
-                       (substring input-string
-                                  0
-                                  (- string-width
-                                     offset-width))
-                       t)
-          (setq input-string
-                (substring input-string
-                           (- string-width
-                              offset-width)))))
-    (while (> (length input-string)
-              string-width)
-      (add-to-list 'splitted-string
-                   (substring input-string
-                              0
-                              string-width)
-                   t)
-      (setq input-string
-            (substring input-string
-                       string-width)))
-    (add-to-list 'splitted-string
-                 input-string
-                 t)
-    splitted-string))
-
-(defun zone-quotes--get-formatted-string (splitted-string)
-  "Gets a string joining input strings"
-  (cl-reduce (lambda (a c)
-               (concat a
-                       "\n"
-                       c
-                       ))
-             splitted-string))
-
-(defun zone-quotes--render-string (string-to-be-rendered offset-x offset-y currentp)
-  "Renders a string at a provided position on the screen buffer"
-  (beginning-of-buffer)
-  (forward-line offset-y)
-  (forward-char offset-x)
-  (delete-char (length string-to-be-rendered))
-  (cond (currentp (insert (propertize string-to-be-rendered
-                                      'face
-                                      '(:inverse-video t))))
-        (t (insert (propertize string-to-be-rendered
-                               'face
-                               '(:strike-through t))))))
 
 ;;;###autoload
 (defun zone-pgm-quotes ()
   "Zone out with quotes."
-  (delete-other-windows)
-  (erase-buffer)
-  (zone-fill-out-screen (window-width) (window-height))
-  (while (not (input-pending-p))
-    (let* ((current-quote (nth (random (length zone-quotes-quotes))
-                               zone-quotes-quotes))
-           (quote-length (length current-quote))
-           (screen-character-count (* (window-width)
-                                      (1- (window-height))))
-           (current-position (random (- screen-character-count
-                                        quote-length)))
-           (y-position (/ current-position
-                          (window-width)))
-           (x-position (% current-position
-                          (window-width)))
-           (splitted-string (zone-quotes--get-splitted-string current-quote
-                                                              (- (window-width)
-                                                                 0)
-                                                              x-position))
-           (string-to-be-printed (zone-quotes--get-formatted-string splitted-string)))
-      (zone-quotes--render-string string-to-be-printed
-                                  x-position
-                                  y-position
-                                  t)
-      (sit-for 7)
-      (zone-quotes--render-string string-to-be-printed
-                                  x-position
-                                  y-position
-                                  nil))))
+  (cl-flet* ((get-splitted-string (input-string string-width offset-width)
+                                  (let* ((splitted-string '()))
+                                    (if (> (length input-string)
+                                           (- string-width
+                                              offset-width))
+                                        (progn
+                                          (add-to-list 'splitted-string
+                                                       (substring input-string
+                                                                  0
+                                                                  (- string-width
+                                                                     offset-width))
+                                                       t)
+                                          (setq input-string
+                                                (substring input-string
+                                                           (- string-width
+                                                              offset-width)))))
+                                    (while (> (length input-string)
+                                              string-width)
+                                      (add-to-list 'splitted-string
+                                                   (substring input-string
+                                                              0
+                                                              string-width)
+                                                   t)
+                                      (setq input-string
+                                            (substring input-string
+                                                       string-width)))
+                                    (add-to-list 'splitted-string
+                                                 input-string
+                                                 t)
+                                    splitted-string))
+             (get-formatted-string (splitted-string)
+                                   (cl-reduce (lambda (a c)
+                                                (concat a
+                                                        "\n"
+                                                        c))
+                                              splitted-string))
+             (render-string (string-to-be-rendered offset-x offset-y currentp)
+                            (beginning-of-buffer)
+                            (forward-line offset-y)
+                            (forward-char offset-x)
+                            (delete-char (length string-to-be-rendered))
+                            (cond (currentp (insert (propertize string-to-be-rendered
+                                                                'face
+                                                                '(:inverse-video t))))
+                                  (t (insert (propertize string-to-be-rendered
+                                                         'face
+                                                         '(:strike-through t)))))))
+    (delete-other-windows)
+    (erase-buffer)
+    (zone-fill-out-screen (window-width) (window-height))
+    (while (not (input-pending-p))
+      (let* ((current-quote (nth (random (length zone-quotes-quotes))
+                                 zone-quotes-quotes))
+             (quote-length (length current-quote))
+             (screen-character-count (* (window-width)
+                                        (1- (window-height))))
+             (current-position (random (- screen-character-count
+                                          quote-length)))
+             (y-position (/ current-position
+                            (window-width)))
+             (x-position (% current-position
+                            (window-width)))
+             (splitted-string (qget-splitted-string current-quote
+                                                                (- (window-width)
+                                                                   0)
+                                                                x-position))
+             (string-to-be-printed (get-formatted-string splitted-string)))
+        (render-string string-to-be-printed
+                                    x-position
+                                    y-position
+                                    t)
+        (sit-for 7)
+        (render-string string-to-be-printed
+                                    x-position
+                                    y-position
+                                    nil)))))
 
 ;;;###autoload
 (defun zone-quotes ()
