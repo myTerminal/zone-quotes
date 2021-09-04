@@ -7,7 +7,7 @@
 ;; Keywords: games
 ;; Maintainer: Mohammed Ismail Ansari <team.terminal@gmail.com>
 ;; Created: 2017/09/11
-;; Package-Requires: ((emacs "24") (cl-lib "0.5")))
+;; Package-Requires: ((emacs "24") (cl-lib "0.5"))
 ;; Description: A zone program to display quotes from a specific collection
 ;; URL: http://ismail.teamfluxion.com
 ;; Compatibility: Emacs24
